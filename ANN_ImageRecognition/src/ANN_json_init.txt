@@ -1,0 +1,8 @@
+{
+    "hidden_layers" : [100],
+    "possible_activation_funcs" : ["rectify", "hyp_tang", "sigmoid"],
+    "activation_functions" : [2],
+    "learning_rate" : 0.05,
+    "possible_error_funcs" : ["squared_errors", "cross_entropy"],
+    "error_func_index" : 1
+}

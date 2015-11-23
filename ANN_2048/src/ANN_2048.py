@@ -205,7 +205,7 @@ def train_net():
         prediction_results = predict(testing_images)[1]
         success_rate = np.mean(prediction_results == np.argmax(testing_true_dist, 1))
         print("Run #" + str(i), success_rate)
-    print("Do you want to play a game?")
+    print("\nSimulation game against random player...")
     play2048()
 
     # end_time_milli = int(round(time.time() * 1000))

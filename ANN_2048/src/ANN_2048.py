@@ -1,16 +1,13 @@
 import theano
 from theano import tensor as T
 import numpy as np
-import scipy.stats as stats
-import basics.mnist_basics as mnist
 import json
 import sys
 import time
 import pickle
 import os
-import math
 import random
-import scoring
+import ai2048demo
 from game2048 import load2048 as load2048
 from game2048 import Game2048 as game2048
 
@@ -75,7 +72,6 @@ def blind_test(feature_sets):
 
 
 def load_image_arrays(image_type):
-    # image_array, labels = mnist.load_all_flat_cases(image_type)
     board_array, labels = load2048.load_cases(image_type)
     np_image_array = np.array(board_array, dtype=theano.config.floatX)
     np_true_dist = create_true_dist(labels)
@@ -149,9 +145,6 @@ def load_images():
     training_images, training_true_dist = load_image_arrays('training')
     testing_images, testing_true_dist = load_image_arrays('testing')
 
-    # training_images = scale_to_one(training_images)
-    # testing_images = scale_to_one(testing_images)
-
 
 def predict_prob_dist(X):
     prev_layer = X
@@ -183,7 +176,6 @@ def init_theano_functions():
     Y = T.fmatrix("Y")
 
     error_func = get_error_func()
-    print("Shaep",training_images.shape)
     num_training_batches = size(training_images)/size_of_training_batch
 
     prob_dist = predict_prob_dist(X)
@@ -196,7 +188,6 @@ def init_theano_functions():
     global train, predict
     train = theano.function(inputs=[X, Y], outputs=[], updates=update, allow_input_downcast=True)
     predict = theano.function(inputs=[X], outputs=[prob_dist, prediction], allow_input_downcast=True)
-    #get_weights = theano.function(inputs=[X], outputs=[: ")(weights)], allow_input_downcast=True)
 
 
 
@@ -211,9 +202,6 @@ def train_net():
             x = training_images[start: end]
             y = training_true_dist[start: end]
             train(x, y)
-        #print_weights = get_weights(testing_images)
-        #print(print_weights)
-        #print("Epoch: " + str(i))
         prediction_results = predict(testing_images)[1]
         success_rate = np.mean(prediction_results == np.argmax(testing_true_dist, 1))
         print("Run #" + str(i), success_rate)
@@ -244,9 +232,7 @@ def playMove(game):
         move = np.argmax(prob, 1)[0]
         game.move(move)
         while (game.old_equals_new_game_matrix()):
-            #print("failed move")
             prob[0][move] = 0
-            #print(prob)
             move = np.argmax(prob, 1)[0]
             game.move(move)
     else:
@@ -269,7 +255,7 @@ def play2048(rounds=50):
         n += 1
     print(own_results)
     print(random_results)
-    score = scoring.welch(random_results, own_results)
+    score = ai2048demo.welch(random_results, own_results)
     print("Demo score:",score)
 
 def print_final_stats(run_time, success_rate):
